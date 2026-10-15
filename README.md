@@ -8,15 +8,15 @@
 
 | 你现在要做什么 | 入口 | 里面有什么 |
 |---|---|---|
-| 我想自己学习 Agent | [人类篇](human/README.md) | 从 DeepSeek 真实调用开始的 00–08 课、可运行代码和验收标准 |
+| 我想自己学习 Agent | [人类篇](human/README.md)：[零基础](human/beginner.md) / [程序员](human/developer.md) | 按编程基础分流，再进入对应课程、代码和验收标准 |
 | 我要让编程 Agent 开发或审查 Agent | [Agent 篇](agents/README.md) | 任务路由、实现约束、来源规则、测试与交付要求 |
-| 我要让我的 Agent 教我 | [Agent 教学模式](agents/TEACHING.md) | 诊断、逐步讲解、练习、测验、反馈和本地学习进度 |
+| 我要让我的 Agent 教我 | [教学模式](agents/TEACHING.md)：[零基础](agents/TEACHING-BEGINNER.md) / [程序员](agents/TEACHING-DEVELOPER.md) | 先判断学习路线，再采用不同讲解、练习和验收方式 |
 
 ## 直接交给你的 Agent
 
 把仓库地址和下面这段话一起发给能够读取 GitHub 仓库的 Agent：
 
-> 阅读 https://github.com/normalpeople553/HowToBuildAgent 。先完整读取根目录 `AGENTS.md` 和 `agents/TEACHING.md`，然后进入教学模式，从课前诊断开始教我学习 Agent 原理。一次只推进一个知识点，先让我预测和动手，再给提示与反馈；不要直接替我完成练习。
+> 阅读 https://github.com/normalpeople553/HowToBuildAgent 。先完整读取根目录 `AGENTS.md` 和 `agents/TEACHING.md`，判断我适合零基础路线还是程序员路线，并说明依据。得到我确认后读取对应教学文件，从课前诊断开始教我学习 Agent 原理。一次只推进一个知识点，先让我预测和动手，再给提示与反馈；不要直接替我完成练习。
 
 如果你希望它替你开发，而不是教学，把最后一句改为：
 

@@ -8,15 +8,15 @@ A practical manual that starts with a real online model call. Humans can follow 
 
 | Goal | Entry | Contents |
 |---|---|---|
-| Learn Agent development myself | [Human Guide](human/README.en.md) | Lessons 00–08, runnable code, and completion gates |
+| Learn Agent development myself | [Human Guide](human/README.en.md): [beginner](human/beginner.en.md) / [developer](human/developer.en.md) | Route by programming experience, then follow the matching course and gates |
 | Ask a coding Agent to implement or review | [Agent Guide](agents/README.en.md) | Task routing, implementation constraints, sources, tests, and delivery rules |
-| Ask my Agent to teach me | [Agent Teaching Mode](agents/TEACHING.en.md) | Diagnosis, incremental lessons, exercises, quizzes, feedback, and local progress |
+| Ask my Agent to teach me | [Teaching Router](agents/TEACHING.en.md): [beginner](agents/TEACHING-BEGINNER.en.md) / [developer](agents/TEACHING-DEVELOPER.en.md) | Select a track, then use track-specific teaching, exercises, and gates |
 
 ## Hand this repository to your Agent
 
 Send a repository-aware Agent this prompt:
 
-> Read https://github.com/normalpeople553/HowToBuildAgent. Read `AGENTS.md` and `agents/TEACHING.en.md` completely, then enter teaching mode and begin with the pre-course diagnosis. Advance one concept at a time. Ask me to predict and practice before giving hints or feedback; do not complete exercises for me.
+> Read https://github.com/normalpeople553/HowToBuildAgent. Read `AGENTS.md` and `agents/TEACHING.en.md`, recommend either the complete beginner or developer track with your reason, and wait for my confirmation. Then read the selected teaching guide and begin the diagnosis. Advance one concept at a time; ask me to predict and practice before giving feedback.
 
 For implementation rather than teaching, ask it to follow `AGENTS.md` and `agents/README.en.md`, then report local tests, live API checks, and unverified boundaries separately.
 

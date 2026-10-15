@@ -8,7 +8,7 @@ This page is for coding Agents that modify or review the repository. If the user
 
 | Intent | Route |
 |---|---|
-| Teach me, continue the course, quiz me | `agents/TEACHING.en.md` |
+| Teach me, continue the course, quiz me | Route through `agents/TEACHING.en.md`, then use the beginner or developer teaching guide |
 | Implement, fix, modify, or review an Agent | This guide |
 | Explain one concept | The smallest relevant Human Guide chapter |
 | Call a specific model | The [Model Manual](https://github.com/normalpeople553/HowToCallLLM) |

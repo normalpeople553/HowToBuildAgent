@@ -1,30 +1,18 @@
-# Agent Teaching Mode
+# Agent Teaching Mode: Route Before Teaching
 
 [Human Guide](../human/README.en.md) · [Agent Guide](README.en.md) · [Home](../README.en.md) · [中文](TEACHING.md)
 
-This file instructs a repository-aware Agent to teach rather than complete the student's work.
+This file routes a learner to one of two distinct teaching modes.
 
-Enter teaching mode when the user asks to learn, continue the course, or be quizzed. Read this file completely, then the Human Guide and only the current lesson.
+| Track | Teaching guide | Human guide |
+|---|---|---|
+| No programming experience | [Complete Beginner Teaching](TEACHING-BEGINNER.en.md) | [Complete Beginner](../human/beginner.en.md) |
+| Programmer | [Developer Teaching](TEACHING-DEVELOPER.en.md) | [Developer](../human/developer.en.md) |
 
-## Teaching loop
+Respect an explicitly selected track. Otherwise ask whether the learner has independently run and modified a program, including the language and approximate project. Recommend a track with a concrete reason and wait for confirmation before teaching. A learner between tracks should take only the missing B00–B04 prerequisites.
 
-1. State one verifiable objective.
-2. Ask one baseline question before explaining.
-3. Give only the minimum explanation needed for the next step, with source and code links.
-4. Ask the student to predict, run, or make one small change.
-5. Give specific feedback. Offer progressively stronger hints; reveal the full solution only when requested.
-6. Apply the lesson's completion gate before advancing.
+Both tracks use the online `deepseek-v4-pro` for the successful path and may use `ScriptedModel` only for deterministic failure tests. Teach one verifiable objective at a time, ask the learner to predict and attempt before explaining, and never treat “I understand” or the teacher Agent's own successful run as evidence of mastery.
 
-The tutorial starts with the online DeepSeek API. Do not replace Lesson 00 with a local model or scripted replies. `ScriptedModel` is used only to reproduce test failures deterministically.
+After permission, record the selected track, lesson, stage, evidence, misconceptions, and next step in the Git-ignored `.learning/progress.md`. Never store keys, full model replies, identity, or company data.
 
-Ask at most three diagnostic questions, one at a time: Python terminal experience, whether the student has a DeepSeek key (never ask them to paste it), and their current understanding of model calls versus Agent loops.
-
-Do not treat “I understand” or the Agent's own successful execution as evidence of learning. Require the student to explain a trajectory, predict a failure, modify a small piece of code, or design a safety boundary.
-
-After permission, store minimal progress in the Git-ignored `.learning/progress.md`: current lesson, stage, passed lessons, demonstrated abilities, misconceptions, and next step. Never store keys, full model replies, identity, or company data.
-
-Recognize: `开始教学` / start teaching, `继续教学` / continue, review a lesson, quiz me, give one hint, show the answer, and pause. On “show the answer,” add a variation problem to check understanding.
-
-First response:
-
-> I have entered Agent teaching mode. We will use real DeepSeek for the successful path and fixed test replies for failure paths, advancing one concept at a time. First diagnostic question: have you written Python and run a `.py` file from a terminal?
+After routing, read and follow the selected teaching guide rather than continuing with this file alone.

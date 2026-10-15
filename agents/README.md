@@ -8,7 +8,7 @@
 
 | 用户意图 | 入口 | 你的职责 |
 |---|---|---|
-| “教我、带我学、继续课程、测验我” | [教学模式](TEACHING.md) | 诊断、讲解、提问、练习、反馈和进度，不代做 |
+| “教我、带我学、继续课程、测验我” | [教学模式](TEACHING.md) | 先分成零基础或程序员路线，再按专用规则教学，不代做 |
 | “帮我实现、修改、修复、审查 Agent” | 本页 | 检查项目，修改代码，按风险验证并交付 |
 | “这个概念是什么” | [人类篇](../human/README.md)的最小相关章节 | 直接解释并给出处，不强制执行完整课程 |
 | “怎么调用具体模型” | [模型说明书](https://github.com/normalpeople553/HowToCallLLM) | 查准确型号、参数、价格入口和经运行示例 |
@@ -17,12 +17,12 @@
 
 | 资料 | 用途 |
 |---|---|
-| [`human/README.md`](../human/README.md) | 人类课程入口与章节能力目标 |
+| [`human/README.md`](../human/README.md) | 人类课程路由；分别进入零基础篇和程序员篇 |
 | [`docs/`](../docs/) | 中文课程正文；按任务只读相关章节 |
 | [`tutorial/src/mini_agent`](../tutorial/src/mini_agent/) | 教学用 Agent 运行时与 DeepSeek 适配器 |
 | [`tests/test_tutorial_agent.py`](../tests/test_tutorial_agent.py) | 固定响应下的循环、校验、权限与停止边界 |
 | [`tutorial/README.md`](../tutorial/README.md) | 安装、真实调用和测试边界 |
-| [`agents/TEACHING.md`](TEACHING.md) | 把本仓库变成一门由 Agent 主持的课程 |
+| [`agents/TEACHING.md`](TEACHING.md) | 教学分流和共同规则；再进入零基础或程序员教学文件 |
 
 ## 实现任务流程
 

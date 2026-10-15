@@ -7,7 +7,7 @@ description: Use this repository to implement or review an Agent, or to teach a 
 
 Read `../AGENTS.md` first.
 
-- For teaching, read `TEACHING.md` completely, then `../human/README.md` and the current lesson. Do not solve exercises before the learner attempts them.
+- For teaching, read `TEACHING.md` completely and route the learner. For a complete beginner, read `TEACHING-BEGINNER.md` and `../human/beginner.md`; for a programmer, read `TEACHING-DEVELOPER.md` and `../human/developer.md`. Then read only the current lesson. Do not solve exercises before the learner attempts them.
 - For implementation, modification, debugging, or review, read `README.md`, then only the relevant chapter and source files.
 - For a narrow factual question, read the smallest relevant Human Guide chapter.
 

@@ -4,9 +4,9 @@
 
 ## 路由
 
-- 用户要学习、上课、继续课程、测验或让 Agent 教自己：完整读取 `agents/TEACHING.md`，再读取 `human/README.md` 和当前课。进入教学模式，不直接替学生完成练习。
+- 用户要学习、上课、继续课程、测验或让 Agent 教自己：先完整读取 `agents/TEACHING.md` 完成分流。零基础者读取 `agents/TEACHING-BEGINNER.md` 与 `human/beginner.md`；程序员读取 `agents/TEACHING-DEVELOPER.md` 与 `human/developer.md`。再读取当前课，进入对应教学模式，不直接替学生完成练习。
 - 用户要开发、修改、测试或审查 Agent：完整读取 `agents/README.md`，再按任务读取相关章节与源码。
-- 用户只问一个概念：从 `human/README.md` 定位最小相关章节，回答后给出下一步，不强制进入完整课程。
+- 用户只问一个概念：根据其编程基础，从 `human/beginner.md` 或 `human/developer.md` 定位最小相关章节，回答后给出下一步，不强制进入完整课程。
 
 ## 仓库约束
 

@@ -53,17 +53,40 @@ class MarkdownLinkTests(unittest.TestCase):
     def test_agent_router_covers_teaching_and_implementation(self):
         instructions = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("agents/TEACHING.md", instructions)
+        self.assertIn("agents/TEACHING-BEGINNER.md", instructions)
+        self.assertIn("agents/TEACHING-DEVELOPER.md", instructions)
         self.assertIn("agents/README.md", instructions)
         self.assertIn("deepseek-v4-pro", instructions)
         self.assertIn("ScriptedModel", instructions)
 
-    def test_teaching_mode_is_incremental_and_private(self):
+    def test_human_guide_has_beginner_and_developer_tracks(self):
+        guide = (ROOT / "human" / "README.md").read_text(encoding="utf-8")
+        self.assertIn("beginner.md", guide)
+        self.assertIn("developer.md", guide)
+        self.assertIn("完全不了解编程", guide)
+
+    def test_teaching_router_has_two_tracks_and_shared_safety(self):
         teaching = (ROOT / "agents" / "TEACHING.md").read_text(encoding="utf-8")
-        self.assertIn("一次一个目标", teaching)
+        self.assertIn("TEACHING-BEGINNER.md", teaching)
+        self.assertIn("TEACHING-DEVELOPER.md", teaching)
+        self.assertIn("一次只推进一个可验证目标", teaching)
         self.assertIn("学生先尝试", teaching)
         self.assertIn(".learning/progress.md", teaching)
-        self.assertIn("DEEPSEEK_API_KEY", teaching)
-        self.assertIn("不记录 Key", teaching)
+        self.assertIn("不要记录 Key", teaching)
+
+    def test_beginner_teaching_has_prerequisites_and_smaller_steps(self):
+        teaching = (ROOT / "agents" / "TEACHING-BEGINNER.md").read_text(encoding="utf-8")
+        for lesson in ("B00", "B01", "B02", "B03", "B04"):
+            with self.subTest(lesson=lesson):
+                self.assertIn(lesson, teaching)
+        self.assertIn("一条消息最多引入一个新概念", teaching)
+
+    def test_developer_teaching_requires_engineering_evidence(self):
+        teaching = (ROOT / "agents" / "TEACHING-DEVELOPER.md").read_text(encoding="utf-8")
+        self.assertIn("正常轨迹", teaching)
+        self.assertIn("失败轨迹", teaching)
+        self.assertIn("不变量", teaching)
+        self.assertIn("代码审查重点", teaching)
 
     def test_learning_progress_is_git_ignored(self):
         ignored = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
