@@ -23,15 +23,15 @@ Start from one model call and learn to build controllable, testable Agents that 
 | Stage | Topic | Status |
 |---|---|---|
 | 01 | Model decisions, tool execution, message history and stop conditions | [Published](en/docs/01-from-model-call-to-first-agent.md) |
-| 02 | Structured output and argument validation | Planned |
-| 03 | Multiple tools, routing and loop control | Planned |
-| 04 | Session state, short-term memory and context management | Planned |
-| 05 | Retrieval and knowledge bases | Planned |
-| 06 | MCP and external tool protocols | Planned |
-| 07 | Testing, evaluation and observability | Planned |
-| 08 | Authorization, safety, human confirmation and deployment | Planned |
+| 02 | Structured output and argument validation | [Published](en/docs/02-structured-output-and-validation.md) |
+| 03 | Multiple tools, routing and loop control | [Published](en/docs/03-multiple-tools-routing-and-loops.md) |
+| 04 | Session state, short-term memory and context management | [Published](en/docs/04-state-memory-and-context.md) |
+| 05 | Retrieval and knowledge bases | [Published](en/docs/05-retrieval-and-knowledge-bases.md) |
+| 06 | MCP and external tool protocols | [Published](en/docs/06-mcp-and-external-tools.md) |
+| 07 | Testing, evaluation and observability | [Published](en/docs/07-testing-evaluation-and-observability.md) |
+| 08 | Authorization, safety, human confirmation and deployment | [Published](en/docs/08-security-confirmation-and-deployment.md) |
 
-The roadmap is a project plan, not a claim that unpublished chapters are complete. New executable code will identify its provenance, run instructions, verification scope and unverified boundaries.
+All eight stages are now published. New executable code will identify its provenance, run instructions, verification scope and unverified boundaries.
 
 ## Checks
 

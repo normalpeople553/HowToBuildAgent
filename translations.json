@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "pairs": [
+    {"source": "README.md", "target": "README.en.md"},
+    {"source": "docs/01-从模型调用到第一个Agent.md", "target": "en/docs/01-from-model-call-to-first-agent.md"},
+    {"source": "docs/02-结构化输出与参数校验.md", "target": "en/docs/02-structured-output-and-validation.md"},
+    {"source": "docs/03-多工具路由与循环控制.md", "target": "en/docs/03-multiple-tools-routing-and-loops.md"},
+    {"source": "docs/04-状态记忆与上下文管理.md", "target": "en/docs/04-state-memory-and-context.md"},
+    {"source": "docs/05-检索与知识库.md", "target": "en/docs/05-retrieval-and-knowledge-bases.md"},
+    {"source": "docs/06-MCP与外部工具协议.md", "target": "en/docs/06-mcp-and-external-tools.md"},
+    {"source": "docs/07-测试评估与可观测性.md", "target": "en/docs/07-testing-evaluation-and-observability.md"},
+    {"source": "docs/08-权限安全人工确认与部署.md", "target": "en/docs/08-security-confirmation-and-deployment.md"}
+  ]
+}
