@@ -4,6 +4,8 @@
 
 Agent security is not making the model “more obedient”; it is limiting the maximum impact of one wrong decision. OWASP identifies excessive functionality, permissions and autonomy as roots of Excessive Agency. NIST's Generative AI Profile addresses governance, measurement and risk management across the lifecycle. [OWASP Excessive Agency](https://genai.owasp.org/llmrisk/llm062025-excessive-agency/) · [NIST Generative AI Profile](https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf)
 
+The tutorial keeps approval policy in [`approvals.py`](../../tutorial/src/mini_agent/approvals.py). A tool marked `requires_approval=True` is denied by `DenyAll` unless the application supplies an explicit alternative; model text cannot approve its own action.
+
 ## 1. Three minimizations
 
 | Principle | Implementation |

@@ -4,6 +4,8 @@
 
 Agent testing cannot be reduced to “the final sentence looked good.” Test deterministic code, tool traces, result quality, cost, latency and safety boundaries. NIST AI RMF places measurement and risk management across the AI lifecycle; this chapter applies that principle to Agent engineering. [NIST AI RMF](https://www.nist.gov/itl/ai-risk-management-framework)
 
+The executable tests are in [`tests/test_tutorial_agent.py`](../../tests/test_tutorial_agent.py), and trace events are defined in [`tracing.py`](../../tutorial/src/mini_agent/tracing.py). Run `python3 -m unittest discover -s tests -p 'test_*.py'`; this does not call a model API.
+
 ## 1. Four test layers
 
 | Layer | Model required? | Examples |

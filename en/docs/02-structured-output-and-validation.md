@@ -4,6 +4,8 @@
 
 This chapter addresses a central boundary: model output is a proposal, and application code decides whether it is safe to process. Support for JSON mode, JSON Schema and strict modes varies by provider and exact model; verify the exact-model documentation rather than treating OpenAI-compatible APIs as feature-identical. [Model Manual parameter navigation](https://github.com/normalpeople553/HowToCallLLM/blob/main/en/docs/parameters.md)
 
+The executable counterparts are [`ToolRegistry.prepare()`](../../tutorial/src/mini_agent/tools.py) and [`validate_weather_arguments()`](../../tutorial/src/mini_agent/example_tools.py). Run `python3 -m unittest discover -s tests -p 'test_tutorial_agent.py'`; `test_extra_argument_is_rejected` proves that valid JSON with an undeclared field is rejected before the handler executes.
+
 ## 1. Three contracts
 
 | Layer | Question | Enforcer |

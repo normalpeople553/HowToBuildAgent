@@ -1,153 +1,128 @@
 # 01 · 从模型调用到第一个 Agent
 
-[English](../en/docs/01-from-model-call-to-first-agent.md) · [Agent 说明书](../README.md) · [模型说明书](https://github.com/normalpeople553/HowToCallLLM)
+[English](../en/docs/01-from-model-call-to-first-agent.md) · [目录](../README.md) · [上一章](00-开始前先看这页.md)
 
-本章面向已经能完成一次模型调用、但还没写过 Agent 的读者。目标不是搭建通用 Agent 框架，而是看懂并运行一个最小工具闭环：用户问天气，模型决定是否调用工具，程序校验并执行工具，再把结果交回模型生成最终回答。
+这一章不再借用一个大而全的框架。我们直接拆开刚才跑过的 Mini Agent，弄清楚一个 Agent 最少由哪些部分组成，以及每一部分为什么必须由应用程序掌控。
 
-本章以模型说明书现有的 [`05_tool_calling.py`](https://github.com/normalpeople553/HowToCallLLM/blob/main/models/deepseek/deepseek-flash/examples/05_tool_calling.py) 为可执行样例。该文件的型号、字段和工具消息格式来自 DeepSeek 官方 [Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/) 与 [Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/)；客户端用法可对照 [OpenAI Python SDK](https://github.com/openai/openai-python)。本页不新增第二份可执行调用代码，也不把其他型号自动视为兼容。
+## 1. Agent 不是“会聊天的模型”
 
-## 1. 先分清模型调用和 Agent
+本教程把 Agent 定义为一种应用结构：应用反复向模型询问下一步，允许模型在预先声明的范围内请求工具；应用负责校验、授权和执行，再在满足停止条件后返回结果。
 
-一次普通模型调用通常是：发送 `messages`，收到一段回答，程序结束。
+它至少有五部分：
 
-本章把 **Agent** 定义为一种应用程序结构：程序反复让模型判断下一步，允许模型请求已注册的工具，应用负责校验和执行工具，并在满足停止条件后返回最终结果。这是本项目用于教学的定义，不是厂商对“Agent”一词的统一标准。
-
-最小闭环包含五部分：
-
-| 部分 | 谁负责 | 本例中的对应内容 |
+| 部分 | 本项目对应位置 | 负责什么 |
 |---|---|---|
-| 目标 | 开发者 | system 消息要求天气问题使用工具，并声明结果是模拟数据 |
-| 决策 | 模型 | 返回最终正文，或返回 `tool_calls` 请求调用工具 |
-| 工具 | 你的程序 | `get_weather(city)` 返回固定的教学数据 |
-| 状态 | 你的程序 | `messages` 保存 user、assistant 和 tool 消息 |
-| 边界 | 你的程序 | 工具白名单、参数校验、唯一 ID、最大轮数和结束检查 |
+| 模型 | [`models.py`](../tutorial/src/mini_agent/models.py) | 返回正文，或提出一个/多个工具请求 |
+| 工具注册表 | [`tools.py`](../tutorial/src/mini_agent/tools.py) | 保存公开说明、参数契约和本地处理函数 |
+| 循环 | [`agent.py`](../tutorial/src/mini_agent/agent.py) | 请求模型、执行工具、回传结果、判断结束 |
+| 状态 | `messages` 与 `used_call_ids` | 保存本轮历史，防止调用 ID 重复 |
+| 边界 | 轮数、长度、校验与批准策略 | 阻止无限循环、越权和无界输出 |
 
-模型不会因为看见函数说明就自动执行本机函数。官方工具调用流程要求应用读取模型返回的工具名和参数、执行实际函数，再使用匹配的 `tool_call_id` 回传结果。[Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/)
+OpenAI 的 Agent 文档把模型、指令、工具、状态和执行环境作为不同配置或资源；直接使用模型响应构建 Agent 时，应用需要自己管理循环、工具执行和历史。[Agents](https://developers.openai.com/api/docs/guides/agents) 本教程选择自己写循环，是为了先看清这些责任，不是说实际项目不能使用 SDK 或框架。
 
-## 2. 先运行现成的完整闭环
+## 2. 先看模型接口，不看厂商 SDK
 
-先克隆模型说明书，再按其[验证与复现](https://github.com/normalpeople553/HowToCallLLM/blob/main/docs/%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%A4%8D%E7%8E%B0.md)创建环境并安装锁定依赖。基础示例直接读取进程环境变量，不自动加载 `.env`。
+打开 [`models.py`](../tutorial/src/mini_agent/models.py)。`ModelClient` 只要求一个 `complete(messages, tools)` 方法，返回 `ModelReply`：
+
+- `content`：最终正文，可能为空；
+- `tool_calls`：模型提出的工具请求；
+- `finish_reason`：这次生成为什么结束。
+
+`ScriptedModel` 也实现了同一接口，但它不做网络请求，只按顺序取出预设回复。这样 `Agent` 不需要知道背后是真实模型、测试替身还是别的厂商适配器。
+
+这是第一个重要设计：**把 Agent 循环依赖的最小模型契约固定下来，把易变化的厂商请求放在适配器中。** 真实模型版本、参数和价格由[模型说明书](https://github.com/normalpeople553/HowToCallLLM)核对，不散落进循环代码。
+
+## 3. 工具说明和执行函数是两件事
+
+打开 [`example_tools.py`](../tutorial/src/mini_agent/example_tools.py)，你会看到三部分：
+
+1. `get_weather`：真正会被 Python 执行的函数；
+2. `validate_weather_arguments`：应用侧的参数与业务边界；
+3. `Tool(...)`：名称、用途和 JSON Schema，供模型判断怎样提出请求。
+
+函数工具通常用 JSON Schema 描述输入；`required` 声明必填属性，`additionalProperties: false` 拒绝未定义的额外属性。[JSON Schema object](https://json-schema.org/understanding-json-schema/reference/object) 但 Schema 只是给模型和结构校验器的契约，不能代替用户权限、资源归属或业务状态检查。
+
+`ToolRegistry` 只会执行显式注册的处理器。即使模型返回 `delete_everything`，程序也不会用反射、`eval` 或字符串拼接寻找一个同名函数。模型输出始终是不可信输入。
+
+## 4. 按七步轨迹读 `Agent.run()`
+
+再次运行：
 
 ```bash
-git clone https://github.com/normalpeople553/HowToCallLLM.git
-cd HowToCallLLM
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements-lock.txt
-export DEEPSEEK_API_KEY="你的Key"
-python models/deepseek/deepseek-flash/examples/05_tool_calling.py
+mini-agent-demo
 ```
 
-Windows PowerShell 的环境激活与 Key 设置方式见模型说明书的[第一次调用](https://github.com/normalpeople553/HowToCallLLM/blob/main/docs/01-5%E5%88%86%E9%92%9F%E8%B7%91%E9%80%9A%E7%AC%AC%E4%B8%80%E6%AC%A1%E8%B0%83%E7%94%A8.md)。最后一条命令会向厂商发起真实请求，可能计费；只在自己授权的 Key 和环境中运行。公开仓库提供源码、出处和复现方式，不公开维护者的执行报告。[来源与核验规则](https://github.com/normalpeople553/HowToCallLLM/blob/main/docs/%E6%9D%A5%E6%BA%90%E4%B8%8E%E6%A0%B8%E9%AA%8C%E8%A7%84%E5%88%99.md)
+然后把输出与 [`Agent.run()`](../tutorial/src/mini_agent/agent.py) 对照。
 
-本例的天气是固定模拟数据，不会查询实时天气。成功运行只能证明这一组型号、代码、输入和环境完成了工具闭环，不能证明天气真实，也不能自动覆盖你改写后的版本。
+### 4.1 `model_request`
 
-## 3. 按程序执行顺序读代码
+程序把当前 `messages` 和 `tools.public_specs()` 交给模型。工具公开说明告诉模型“可以请求什么”，但不包含 Python 函数对象，也不会授予系统权限。
 
-### 第一步：把工具能力描述给模型
+### 4.2 `model_response`
 
-`tools` 中的函数说明包含：
+模型可能直接返回正文，也可能返回工具调用。函数调用是多步骤对话，不是模型替应用执行函数。[OpenAI Function calling](https://developers.openai.com/api/docs/guides/function-calling)
 
-- `name`：模型返回时使用的工具名；
-- `description`：告诉模型何时适合使用；
-- `parameters`：用 JSON Schema 描述参数；
-- `required` 与 `additionalProperties`：声明必填字段并拒绝未定义字段。
+### 4.3 整批准备
 
-这些字段只描述模型可以提出什么请求，不会给模型操作电脑、访问网络或执行 Python 的权限。DeepSeek 当前只支持 function 类型的工具，工具名必须唯一；完整字段以 [Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/) 为准。
+`_prepare_batch` 在任何工具执行前完成：
 
-### 第二步：在程序里实现真正的工具
+- 工具名必须在注册表；
+- 调用 ID 非空且不能重复；
+- 参数必须是 JSON 对象；
+- 参数还要通过具体工具的本地校验。
 
-`get_weather(city)` 是普通 Python 函数。模型只会生成类似 `{"city":"杭州"}` 的参数，真正调用哪个函数、连接哪个数据库、是否产生副作用，都由应用决定。
+先校验整批，避免两个调用中第一个已经产生影响、第二个才发现非法的半完成状态。
 
-初学时优先使用无副作用的模拟工具。把工具换成发送邮件、转账、删除文件或修改生产数据后，应加入身份校验、权限检查、幂等控制和明确确认；这些是本项目的安全建议，不是模型自动提供的能力。
+### 4.4 保存 assistant 工具请求
 
-### 第三步：校验模型提出的调用
+程序把包含 `tool_calls` 的 assistant 消息完整加入历史。下一次请求需要知道模型刚才提出过什么，工具结果才能通过 `tool_call_id` 与原请求配对。DeepSeek 的工具调用指南同样要求先加入模型消息，再加入对应的 tool 消息。[DeepSeek Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/)
 
-样例的 `validate_call` 在执行工具前检查：
+### 4.5 执行并保存结果
 
-1. 调用类型必须是 function；
-2. 工具名必须在白名单；
-3. `tool_call_id` 必须非空且不能重复；
-4. 参数必须是可解析的 JSON；
-5. 参数集合、类型、长度和控制字符必须符合本地规则。
+应用调用本地处理器，把结果序列化为字符串，并限制最大长度。真实项目还应对每个工具增加超时、资源限制、敏感字段清理和业务审计；本项目先保留最小接口。
 
-模型生成的参数属于不可信输入。JSON Schema 能帮助模型生成结构，但应用仍需在真正执行前校验；涉及外部系统时还要校验业务权限。样例先校验本批全部调用，再执行其中任何一个，避免半批执行造成不一致。
+### 4.6 再次请求模型
 
-### 第四步：维护消息历史
+新的 `messages` 已包含用户问题、assistant 的工具请求和 tool 结果。模型据此生成最终回答，也可以继续请求另一个工具，所以循环会再次判断。
 
-当模型返回工具调用时，程序先把完整 assistant 消息追加到 `messages`，再为每个结果追加一条 `role="tool"` 消息。tool 消息使用原调用的 `tool_call_id`，让模型知道结果对应哪个请求。[Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/)
+### 4.7 `turn_finished`
 
-若开启 DeepSeek 思考模式并携带 `tools`，后续请求还必须完整回传之前的 `reasoning_content`；遗漏时官方说明可能返回 400。直接保留 SDK 返回的完整 assistant 消息，可以避免手工漏字段。[Thinking Mode](https://api-docs.deepseek.com/guides/thinking_mode/)
+只有没有待处理工具、`finish_reason == "stop"` 且最终正文非空时，程序才返回 `AgentResult`。如果达到最大轮数，最后一轮的新工具不会被执行，因为执行之后已经没有预算让模型读取结果并完成回答。
 
-### 第五步：循环，直到完成或停止
+## 5. 亲手制造三个错误
 
-整个过程可以写成下面的伪代码；它用于解释控制流，不是一份新的可运行 API 示例：
+每次只改一处，观察报错后恢复：
 
-```text
-最多重复 N 轮：
-    把 messages 和 tools 发给模型
-    如果模型请求工具：
-        先校验整批调用
-        保存完整 assistant 消息
-        执行允许的工具并保存 tool 结果
-        继续下一轮
-    否则：
-        检查正常结束和非空正文
-        返回最终答案
-超过 N 轮仍未完成：报错并停止
+1. 在 `demo.py` 把工具名改成 `unknown_tool`，确认执行器拒绝未注册工具；
+2. 把 `arguments` 改成 `{"city":"杭州","extra":true}`，确认额外字段被拒绝；
+3. 创建 Agent 时传入 `max_model_turns=1`，确认程序不会在最后一轮继续执行工具。
+
+随后运行测试确保恢复正确：
+
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-样例把模型调用上限设为 6 轮，并要求至少实际执行一次工具。`max_model_turns` 是应用自己的防失控边界，不是模型请求参数。
+## 6. 最后才接真实模型
 
-## 4. 为什么不能只写一个 while True
+[`real_deepseek.py`](../tutorial/src/mini_agent/real_deepseek.py) 只负责把 DeepSeek SDK 响应转换成同一个 `ModelReply`。循环、工具和测试代码不需要因厂商变化而重写。
 
-一个可以触发工具的程序已经具备外部影响力。即使模型调用成功，下面的情况也可能让 Agent 出错：
+在自己授权的环境中设置 Key：
 
-- 模型反复请求同一工具，导致费用和外部操作不断增加；
-- 参数虽然是合法 JSON，但用户无权执行对应操作；
-- 工具已经成功执行，网络重试又重复执行一次；
-- 工具返回敏感内容，随后被完整发送给模型或写进日志；
-- 模型返回 `tool_calls`，程序却把空正文当成最终答案；
-- 某一步失败后，程序继续使用不完整消息历史。
+```bash
+export DEEPSEEK_API_KEY="你的 Key"
+mini-agent-deepseek
+```
 
-因此，最小 Agent 至少要有：调用轮数或总预算、工具白名单、参数与权限校验、明确的成功条件、错误停止路径，以及对有副作用工具的重复执行防护。这些是项目级工程建议；具体业务还要增加审计、超时、速率限制和人工确认。
+这会请求真实 API，并可能计费。适配器当前明确使用 `deepseek-v4-pro`；不要把 `OpenAI-compatible` 理解为所有厂商、型号和思考模式都完全一致。DeepSeek 的当前型号、价格页面和经运行的调用示例见[模型说明书](https://github.com/normalpeople553/HowToCallLLM/tree/main/models/deepseek)。
 
-## 5. 怎样把模拟天气扩展成自己的 Agent
+## 7. 本章完成标准
 
-按下面的顺序扩展，每一步单独测试：
+- [ ] 能画出“模型请求 → 工具执行 → 工具结果 → 再次请求”的闭环；
+- [ ] 能说明模型可见工具 Schema 与本地处理函数的区别；
+- [ ] 知道为什么必须保留 assistant 工具请求与 `tool_call_id`；
+- [ ] 知道为什么先校验整批，再执行任何工具；
+- [ ] 知道最终答案、工具调用和异常停止是三种不同路径；
+- [ ] 能用脚本模型测试循环，不依赖真实 API 的随机输出。
 
-1. **替换工具内部实现**：保留 `get_weather(city)` 的输入输出契约，先把固定结果换成你有权调用的真实服务。
-2. **增加第二个只读工具**：例如订单查询或知识检索；为每个工具建立独立白名单和参数校验，不用 `eval` 执行模型文本。
-3. **加入业务状态**：把用户身份、会话 ID 和必要的历史放在你自己的存储中；`messages` 只是发送给模型的上下文，不等于可靠数据库。
-4. **增加有副作用的动作**：先加入权限和确认，再实现发送、修改或删除；工具结果应记录可审计的业务 ID，而不是只看模型说“成功”。
-5. **最后再引入 Agent 框架**：当你已理解工具协议、消息历史和停止条件后，再让框架代管循环。框架不会替你确认型号参数、业务权限或结果真实性。
-
-如果要更换厂商或型号，先从[模型目录](https://github.com/normalpeople553/HowToCallLLM/tree/main/models)确认准确 API ID，再看该型号的参数页和工具示例。OpenAI-compatible 不表示思考字段、工具选择、严格模式或消息回传规则完全相同。[兼容接口说明](https://github.com/normalpeople553/HowToCallLLM/blob/main/docs/02-%E4%B8%80%E4%B8%AA%E5%A5%97%E8%B7%AF%E8%B0%83%E9%81%8D%E6%89%80%E6%9C%89%E6%A8%A1%E5%9E%8B.md)
-
-## 6. 测试顺序
-
-推荐把测试拆成四层：
-
-| 层次 | 不调用模型时可检查什么 | 需要真实请求时检查什么 |
-|---|---|---|
-| 工具函数 | 固定输入能否得到预期结构；异常和权限是否正确处理 | 外部服务账户、网络及真实数据权限 |
-| 参数校验 | 非法 JSON、未知工具、缺字段、重复 ID 是否被拒绝 | 模型实际返回的参数能否通过同一校验 |
-| Agent 循环 | 用构造的 assistant/tool 消息测试分支、轮数和停止条件 | 是否真实出现工具调用并获得最终正文 |
-| 业务结果 | 模拟结果是否符合本地断言 | 真实结果是否正确、完整且可审计 |
-
-离线测试不能证明厂商当前可用；一次真实调用也不能证明所有输入可靠。修改提示词、工具、型号、参数或消息历史后，应重新验证改变后的路径。[验证与复现](https://github.com/normalpeople553/HowToCallLLM/blob/main/docs/%E9%AA%8C%E8%AF%81%E4%B8%8E%E5%A4%8D%E7%8E%B0.md)
-
-## 7. 完成第一个 Agent 的检查表
-
-- [ ] 使用准确型号和对应官方工具调用文档；
-- [ ] Key 只从环境变量读取，没有打印或写入代码；
-- [ ] 工具名来自固定白名单；
-- [ ] 参数先解析、校验，再执行；
-- [ ] 完整保存 assistant 工具调用，并用匹配的 `tool_call_id` 回传；
-- [ ] 有最大轮数、超时或总预算；
-- [ ] 最终结果检查结束原因与非空正文；
-- [ ] 模拟数据明确标注，不冒充真实业务结果；
-- [ ] 有副作用工具具备权限、确认和防重复措施；
-- [ ] 改写后的版本已在授权环境重新验证。
-
-完成这个闭环后，你已经掌握 Agent 最核心的工程结构。下一步不是立刻增加更多框架，而是把一个真实但低风险的工具接稳，再逐步加入状态、检索、权限和可观测性。
+下一章会把“参数合法”拆成 JSON 语法、Schema 结构和业务规则三层：[02 · 结构化输出与参数校验](02-结构化输出与参数校验.md)。
