@@ -44,6 +44,31 @@ class MarkdownLinkTests(unittest.TestCase):
         self.assertNotIn("计划中", (ROOT / "README.md").read_text(encoding="utf-8"))
         self.assertNotIn("Planned", (ROOT / "README.en.md").read_text(encoding="utf-8"))
 
+    def test_homepage_exposes_three_distinct_routes(self):
+        homepage = (ROOT / "README.md").read_text(encoding="utf-8")
+        for route in ("human/README.md", "agents/README.md", "agents/TEACHING.md"):
+            with self.subTest(route=route):
+                self.assertIn(route, homepage)
+
+    def test_agent_router_covers_teaching_and_implementation(self):
+        instructions = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+        self.assertIn("agents/TEACHING.md", instructions)
+        self.assertIn("agents/README.md", instructions)
+        self.assertIn("deepseek-v4-pro", instructions)
+        self.assertIn("ScriptedModel", instructions)
+
+    def test_teaching_mode_is_incremental_and_private(self):
+        teaching = (ROOT / "agents" / "TEACHING.md").read_text(encoding="utf-8")
+        self.assertIn("一次一个目标", teaching)
+        self.assertIn("学生先尝试", teaching)
+        self.assertIn(".learning/progress.md", teaching)
+        self.assertIn("DEEPSEEK_API_KEY", teaching)
+        self.assertIn("不记录 Key", teaching)
+
+    def test_learning_progress_is_git_ignored(self):
+        ignored = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+        self.assertIn(".learning/", ignored)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,13 +2,27 @@
 
 [中文](README.md) · English
 
-A runnable learning path for first-time Agent developers. Start with the online DeepSeek API, complete a real model–tool loop, then learn validation, loop control, state, retrieval, MCP, testing, and authorization.
+A practical manual that starts with a real online model call. Humans can follow the course, coding Agents can implement and review against repository rules, and repository-aware Agents can enter teaching mode to teach the principles interactively.
 
-You do not need to install a local model or learn an Agent framework first. The [`tutorial`](tutorial/) project uses `deepseek-v4-pro` by default; the model really selects tools, while the application validates, executes, and returns their results.
+## Three entry points
 
-## Start now
+| Goal | Entry | Contents |
+|---|---|---|
+| Learn Agent development myself | [Human Guide](human/README.en.md) | Lessons 00–08, runnable code, and completion gates |
+| Ask a coding Agent to implement or review | [Agent Guide](agents/README.en.md) | Task routing, implementation constraints, sources, tests, and delivery rules |
+| Ask my Agent to teach me | [Agent Teaching Mode](agents/TEACHING.en.md) | Diagnosis, incremental lessons, exercises, quizzes, feedback, and local progress |
 
-Use Python 3.10 or later:
+## Hand this repository to your Agent
+
+Send a repository-aware Agent this prompt:
+
+> Read https://github.com/normalpeople553/HowToBuildAgent. Read `AGENTS.md` and `agents/TEACHING.en.md` completely, then enter teaching mode and begin with the pre-course diagnosis. Advance one concept at a time. Ask me to predict and practice before giving hints or feedback; do not complete exercises for me.
+
+For implementation rather than teaching, ask it to follow `AGENTS.md` and `agents/README.en.md`, then report local tests, live API checks, and unverified boundaries separately.
+
+## First live run
+
+The tutorial defaults to the online `deepseek-v4-pro`; no local model installation is required:
 
 ```bash
 git clone https://github.com/normalpeople553/HowToBuildAgent.git
@@ -20,51 +34,19 @@ export DEEPSEEK_API_KEY="your DeepSeek API key"
 mini-agent-demo
 ```
 
-On Windows PowerShell, set the key with `$env:DEEPSEEK_API_KEY="your DeepSeek API key"`. A successful run shows two real DeepSeek decisions with one tool execution between them. The request may incur charges; the weather tool itself returns explicitly simulated data.
+This makes a real API request and may incur charges. The weather tool returns explicitly simulated teaching data. See the [Human Guide](human/README.en.md) for the complete course.
 
-First-time readers should begin with [00 · Read This First](en/docs/00-read-this-first.md).
+## Scope
 
-## Learning path
+- This repository covers Agent loops, tools, validation, state, memory, retrieval, MCP, testing, authorization, and deployment.
+- The [Model Manual](https://github.com/normalpeople553/HowToCallLLM) maintains exact provider model IDs, parameters, pricing links, and model-calling source that has been run.
+- `ScriptedModel` is a deterministic test double, not live-provider evidence or the tutorial default.
+- Learning progress is stored under the Git-ignored `.learning/` directory only after the learner agrees.
 
-| Stage | Task | Chapter |
-|---|---|---|
-| 00 | Set up the environment and run a real DeepSeek tool call | [Read This First](en/docs/00-read-this-first.md) |
-| 01 | Understand the model, tool, history, and stop-condition loop | [Your First Agent](en/docs/01-from-model-call-to-first-agent.md) |
-| 02 | Reject malformed and invalid arguments | [Structured Output and Validation](en/docs/02-structured-output-and-validation.md) |
-| 03 | Add tools and bound routing, retries, and loops | [Multiple Tools and Loop Control](en/docs/03-multiple-tools-routing-and-loops.md) |
-| 04 | Separate history, business state, summaries, and memory | [State, Memory, and Context](en/docs/04-state-memory-and-context.md) |
-| 05 | Add a permission-aware knowledge base | [Retrieval and Knowledge Bases](en/docs/05-retrieval-and-knowledge-bases.md) |
-| 06 | Understand what MCP does—and what it does not do | [MCP and External Tools](en/docs/06-mcp-and-external-tools.md) |
-| 07 | Test trajectories and record useful diagnostic data | [Testing and Observability](en/docs/07-testing-evaluation-and-observability.md) |
-| 08 | Add authorization, approval, sandboxing, and deployment boundaries | [Safety and Deployment](en/docs/08-security-confirmation-and-deployment.md) |
-
-## Code map
-
-| File | Role |
-|---|---|
-| [`real_deepseek.py`](tutorial/src/mini_agent/real_deepseek.py) | Convert real DeepSeek responses into the loop's internal model reply |
-| [`models.py`](tutorial/src/mini_agent/models.py) | Stable model boundary; the scripted model is only a unit-test double |
-| [`tools.py`](tutorial/src/mini_agent/tools.py) | Tool registration, public schemas, argument validation, and execution |
-| [`agent.py`](tutorial/src/mini_agent/agent.py) | The complete bounded model–tool loop |
-| [`approvals.py`](tutorial/src/mini_agent/approvals.py) | Application-owned approval policies for side effects |
-| [`tracing.py`](tutorial/src/mini_agent/tracing.py) | Events used by tests and diagnostics |
-| [`demo.py`](tutorial/src/mini_agent/demo.py) | First real DeepSeek tool trajectory |
-
-## Repository boundary
-
-- This repository teaches Agent application design and implementation.
-- The [Model Manual](https://github.com/normalpeople553/HowToCallLLM) maintains exact model IDs, provider parameters, pricing links, and model-calling source that has been run against real APIs.
-
-Function calling is a multi-step application flow; compare [OpenAI Function calling](https://developers.openai.com/api/docs/guides/function-calling) and [DeepSeek Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/). Object constraints follow [JSON Schema](https://json-schema.org/understanding-json-schema/reference/object). Provider features can change, so one compatible interface must not be treated as proof that all models behave identically.
-
-## Verification
-
-This command runs local link, translation, and Mini Agent trajectory tests without calling a model API:
+Local checks do not call a model API:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
-
-`mini-agent-demo` and `mini-agent-multi` send example messages to DeepSeek and may incur charges. Unit tests use scripted replies and do not call a provider; that scripted model is a test double, not the tutorial default. See the [tutorial README](tutorial/README.md) for the exact boundary.
 
 Licensed under the [Unlicense](LICENSE).

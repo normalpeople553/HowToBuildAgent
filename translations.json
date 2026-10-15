@@ -2,6 +2,9 @@
   "schema_version": 1,
   "pairs": [
     {"source": "README.md", "target": "README.en.md"},
+    {"source": "human/README.md", "target": "human/README.en.md"},
+    {"source": "agents/README.md", "target": "agents/README.en.md"},
+    {"source": "agents/TEACHING.md", "target": "agents/TEACHING.en.md"},
     {"source": "docs/00-开始前先看这页.md", "target": "en/docs/00-read-this-first.md"},
     {"source": "docs/01-从模型调用到第一个Agent.md", "target": "en/docs/01-from-model-call-to-first-agent.md"},
     {"source": "docs/02-结构化输出与参数校验.md", "target": "en/docs/02-structured-output-and-validation.md"},
