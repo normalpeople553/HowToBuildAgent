@@ -1,37 +1,27 @@
-"""Run the first complete agent without a network request or API key."""
+"""Run the first complete Agent with DeepSeek V4 Pro."""
 
 from __future__ import annotations
 
+import os
+
 from .agent import Agent
 from .example_tools import build_example_registry
-from .models import ModelReply, ScriptedModel, ToolCall
+from .real_deepseek import DeepSeekChatModel
 
 
-def build_demo_agent() -> Agent:
-    model = ScriptedModel(
-        [
-            ModelReply(
-                tool_calls=(
-                    ToolCall(
-                        id="call_demo_1",
-                        name="get_weather",
-                        arguments='{"city":"杭州"}',
-                    ),
-                ),
-                finish_reason="tool_calls",
-            ),
-            ModelReply(content="杭州：晴。这是教学模拟数据，不是实时天气。"),
-        ]
-    )
+def build_demo_agent(api_key: str) -> Agent:
     return Agent(
-        model=model,
+        model=DeepSeekChatModel(api_key),
         tools=build_example_registry(),
         instructions="天气问题必须使用 get_weather，并明确结果是模拟数据。",
     )
 
 
 def main() -> None:
-    result = build_demo_agent().run("杭州天气如何？")
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        raise RuntimeError("请先设置 DEEPSEEK_API_KEY；不要把 Key 写进源码")
+    result = build_demo_agent(api_key).run("杭州天气如何？")
     print(result.answer)
     print("\n执行轨迹：")
     for event in result.trace:

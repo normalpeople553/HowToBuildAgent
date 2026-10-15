@@ -1,4 +1,4 @@
-"""Model-facing types and a deterministic model used by the offline lessons."""
+"""Model-facing types plus a deterministic test double."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ class ModelClient(Protocol):
 
 
 class ScriptedModel:
-    """Return predefined replies so the whole loop can be learned and tested offline."""
+    """Return predefined replies for unit tests without replacing the real tutorial model."""
 
     def __init__(self, replies: Sequence[ModelReply]) -> None:
         self._replies = list(replies)

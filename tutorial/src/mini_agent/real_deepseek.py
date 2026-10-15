@@ -7,11 +7,8 @@ Official protocol sources:
 
 from __future__ import annotations
 
-import os
 from typing import Sequence
 
-from .agent import Agent
-from .example_tools import build_example_registry
 from .models import Message, ModelReply, ToolCall, ToolSpec
 
 
@@ -53,20 +50,3 @@ class DeepSeekChatModel:
             tool_calls=calls,
             finish_reason=choice.finish_reason or "unknown",
         )
-
-
-def main() -> None:
-    api_key = os.environ.get("DEEPSEEK_API_KEY")
-    if not api_key:
-        raise RuntimeError("请先设置 DEEPSEEK_API_KEY；不要把 Key 写进源码")
-    agent = Agent(
-        model=DeepSeekChatModel(api_key),
-        tools=build_example_registry(),
-        instructions="天气问题必须使用 get_weather，并明确结果是模拟数据。",
-    )
-    result = agent.run("杭州天气如何？")
-    print(result.answer)
-
-
-if __name__ == "__main__":
-    main()

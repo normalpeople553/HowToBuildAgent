@@ -14,7 +14,6 @@ dependencies = [
 [project.scripts]
 mini-agent-demo = "mini_agent.demo:main"
 mini-agent-multi = "mini_agent.multi_tool_demo:main"
-mini-agent-deepseek = "mini_agent.real_deepseek:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

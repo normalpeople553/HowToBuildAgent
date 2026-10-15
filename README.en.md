@@ -2,9 +2,9 @@
 
 [中文](README.md) · English
 
-A runnable learning path for first-time Agent developers. Start in an empty environment, run an offline model–tool loop, then learn validation, loop control, state, retrieval, MCP, testing, and authorization.
+A runnable learning path for first-time Agent developers. Start with the online DeepSeek API, complete a real model–tool loop, then learn validation, loop control, state, retrieval, MCP, testing, and authorization.
 
-You do not need an Agent framework or an API key for the first lesson. The [`tutorial`](tutorial/) project uses a deterministic scripted model first; after you understand the control flow, the same loop can be connected to a real model.
+You do not need to install a local model or learn an Agent framework first. The [`tutorial`](tutorial/) project uses `deepseek-v4-pro` by default; the model really selects tools, while the application validates, executes, and returns their results.
 
 ## Start now
 
@@ -16,10 +16,11 @@ cd HowToBuildAgent
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e tutorial
+export DEEPSEEK_API_KEY="your DeepSeek API key"
 mini-agent-demo
 ```
 
-On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. A successful run shows two model decisions with one tool execution between them. It makes no network request, and the weather result is explicitly simulated.
+On Windows PowerShell, set the key with `$env:DEEPSEEK_API_KEY="your DeepSeek API key"`. A successful run shows two real DeepSeek decisions with one tool execution between them. The request may incur charges; the weather tool itself returns explicitly simulated data.
 
 First-time readers should begin with [00 · Read This First](en/docs/00-read-this-first.md).
 
@@ -27,7 +28,7 @@ First-time readers should begin with [00 · Read This First](en/docs/00-read-thi
 
 | Stage | Task | Chapter |
 |---|---|---|
-| 00 | Set up the environment and run the free offline demo | [Read This First](en/docs/00-read-this-first.md) |
+| 00 | Set up the environment and run a real DeepSeek tool call | [Read This First](en/docs/00-read-this-first.md) |
 | 01 | Understand the model, tool, history, and stop-condition loop | [Your First Agent](en/docs/01-from-model-call-to-first-agent.md) |
 | 02 | Reject malformed and invalid arguments | [Structured Output and Validation](en/docs/02-structured-output-and-validation.md) |
 | 03 | Add tools and bound routing, retries, and loops | [Multiple Tools and Loop Control](en/docs/03-multiple-tools-routing-and-loops.md) |
@@ -41,13 +42,13 @@ First-time readers should begin with [00 · Read This First](en/docs/00-read-thi
 
 | File | Role |
 |---|---|
-| [`models.py`](tutorial/src/mini_agent/models.py) | Stable model boundary plus the deterministic scripted model |
+| [`real_deepseek.py`](tutorial/src/mini_agent/real_deepseek.py) | Convert real DeepSeek responses into the loop's internal model reply |
+| [`models.py`](tutorial/src/mini_agent/models.py) | Stable model boundary; the scripted model is only a unit-test double |
 | [`tools.py`](tutorial/src/mini_agent/tools.py) | Tool registration, public schemas, argument validation, and execution |
 | [`agent.py`](tutorial/src/mini_agent/agent.py) | The complete bounded model–tool loop |
 | [`approvals.py`](tutorial/src/mini_agent/approvals.py) | Application-owned approval policies for side effects |
 | [`tracing.py`](tutorial/src/mini_agent/tracing.py) | Events used by tests and diagnostics |
-| [`demo.py`](tutorial/src/mini_agent/demo.py) | First complete offline trajectory |
-| [`real_deepseek.py`](tutorial/src/mini_agent/real_deepseek.py) | Real-model adapter to run only after the offline lesson |
+| [`demo.py`](tutorial/src/mini_agent/demo.py) | First real DeepSeek tool trajectory |
 
 ## Repository boundary
 
@@ -64,6 +65,6 @@ This command runs local link, translation, and Mini Agent trajectory tests witho
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-`mini-agent-demo` is also offline. Only `mini-agent-deepseek`, run after you set `DEEPSEEK_API_KEY`, sends content to a provider and may incur charges. See the [tutorial README](tutorial/README.md) for the exact boundary.
+`mini-agent-demo` and `mini-agent-multi` send example messages to DeepSeek and may incur charges. Unit tests use scripted replies and do not call a provider; that scripted model is a test double, not the tutorial default. See the [tutorial README](tutorial/README.md) for the exact boundary.
 
 Licensed under the [Unlicense](LICENSE).

@@ -1,14 +1,20 @@
-# 00 · Read This First
+# 00 · Run Your First Agent with DeepSeek
 
 [中文](../../docs/00-开始前先看这页.md) · [Contents](../../README.en.md)
 
-This page assumes only basic Python. The goal is to run a complete Agent before learning the terminology.
+The first lesson does not install a local model or use a fake model as the main demo. You will call the online DeepSeek API, let the real model request a tool, execute that tool in Python, and return the result to the model.
 
-## What you will run
+## Configure the API key
 
-The first example follows a complete function-calling loop: the model proposes `get_weather`, the application validates and executes it, the result is appended as a tool message, and the model returns a final answer. Function calling is a multi-step application flow; the model does not execute your local Python function by itself. [OpenAI Function calling](https://developers.openai.com/api/docs/guides/function-calling) · [DeepSeek Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/)
+Create a key at [DeepSeek API Keys](https://platform.deepseek.com/api_keys). Never place it in source code or commit it to Git.
 
-## Setup
+```bash
+export DEEPSEEK_API_KEY="your DeepSeek API key"
+```
+
+PowerShell uses `$env:DEEPSEEK_API_KEY="your DeepSeek API key"`.
+
+## Install and run
 
 Use Python 3.10 or later:
 
@@ -21,24 +27,24 @@ python -m pip install -e tutorial
 mini-agent-demo
 ```
 
-On Windows PowerShell, activate with `.venv\Scripts\Activate.ps1`. The demo uses `ScriptedModel`, so it is deterministic, offline, and needs no API key. The weather result is explicitly simulated.
+This makes real API requests and may incur charges. The default is `deepseek-v4-pro`, which is listed by the current DeepSeek Chat API and supports tool calls. [Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/) Check the live [Models & Pricing](https://api-docs.deepseek.com/quick_start/pricing/) page for prices.
 
-The trace should contain, in order: a model request, a response asking for one tool, tool start and finish events, another model request, a final model response, and `turn_finished`.
+The expected trajectory is: DeepSeek requests `get_weather`, the application validates and executes it, the result is returned as a tool message, and DeepSeek produces the final answer. The model call and tool selection are real; the weather function deliberately returns simulated teaching data.
 
-## Verify the local logic
+Function calling is a multi-step application flow, and generated arguments still require application validation. [DeepSeek Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/)
+
+## Read the code
+
+1. [`demo.py`](../../tutorial/src/mini_agent/demo.py)
+2. [`real_deepseek.py`](../../tutorial/src/mini_agent/real_deepseek.py)
+3. `Agent.run()` in [`agent.py`](../../tutorial/src/mini_agent/agent.py)
+4. [`example_tools.py`](../../tutorial/src/mini_agent/example_tools.py)
+5. [`tools.py`](../../tutorial/src/mini_agent/tools.py)
+
+After the live call succeeds, run the regression tests:
 
 ```bash
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-These tests make no model API request. They cover the successful loop, unknown tools, duplicate call IDs, the final-turn boundary, local links, and translation pairs. Passing them verifies the application logic under fixed inputs, not provider availability.
-
-## Reading order
-
-1. [`demo.py`](../../tutorial/src/mini_agent/demo.py)
-2. `Agent.run()` in [`agent.py`](../../tutorial/src/mini_agent/agent.py)
-3. [`example_tools.py`](../../tutorial/src/mini_agent/example_tools.py)
-4. [`tools.py`](../../tutorial/src/mini_agent/tools.py)
-5. [`models.py`](../../tutorial/src/mini_agent/models.py)
-
-Continue with [01 · From a Model Call to Your First Agent](01-from-model-call-to-first-agent.md). Connect the real model only after you can explain the loop and pass the offline tests. Running `mini-agent-deepseek` with `DEEPSEEK_API_KEY` sends a real request and may incur charges; current model details belong in the [Model Manual](https://github.com/normalpeople553/HowToCallLLM/tree/main/models/deepseek).
+Tests use fixed scripted replies to reproduce error paths without spending API tokens. That is a test double, not the tutorial's default model. Continue with [01 · From a Model Call to Your First Agent](01-from-model-call-to-first-agent.md).

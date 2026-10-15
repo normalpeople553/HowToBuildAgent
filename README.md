@@ -2,9 +2,9 @@
 
 中文 · [English](README.en.md)
 
-给第一次开发 Agent 的人准备的一条可运行学习路线：从空环境开始，先跑通一个不联网的模型—工具闭环，再逐步理解参数校验、循环、状态、检索、MCP、测试和权限。
+给第一次开发 Agent 的人准备的一条可运行学习路线：从 DeepSeek 在线 API 开始，先跑通一次真实的模型—工具闭环，再逐步理解参数校验、循环、状态、检索、MCP、测试和权限。
 
-你不需要先学 Agent 框架，也不需要先购买 API。仓库里的 [Mini Agent](tutorial/) 只有一组小文件，默认使用可预测的脚本模型；等你看懂每一步后，再把同一套循环接到真实模型。
+你不需要先安装本地模型，也不需要先学 Agent 框架。仓库里的 [Mini Agent](tutorial/) 默认调用 `deepseek-v4-pro`：模型真实决定是否请求工具，你的程序负责校验、执行并回传结果。
 
 ## 现在就开始
 
@@ -16,10 +16,11 @@ cd HowToBuildAgent
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e tutorial
+export DEEPSEEK_API_KEY="你的 DeepSeek API Key"
 mini-agent-demo
 ```
 
-Windows PowerShell 的激活命令是 `.venv\Scripts\Activate.ps1`，其余相同。成功后你会看到一次完整轨迹：模型先请求 `get_weather`，程序执行工具，再把工具结果交给模型，模型最后返回正文。这个演示不联网，天气是明确标注的模拟数据。
+Windows PowerShell 使用 `$env:DEEPSEEK_API_KEY="你的 DeepSeek API Key"` 设置 Key。成功后你会看到一次真实轨迹：DeepSeek 请求 `get_weather`，程序执行工具，再把工具结果交回 DeepSeek，最后得到正文。调用会联网并可能计费；天气工具本身返回明确标注的教学模拟数据。
 
 第一次阅读请从 [00 · 开始前先看这页](docs/00-开始前先看这页.md) 开始。它会解释每条命令、目录和成功标准。
 
@@ -47,7 +48,7 @@ Agent 循环 ──→ 模型：回答，或提出工具调用
 
 | 顺序 | 你要完成的任务 | 阅读入口 |
 |---|---|---|
-| 00 | 配好环境，跑通不花钱的完整演示 | [开始前先看这页](docs/00-开始前先看这页.md) |
+| 00 | 配好环境，跑通 DeepSeek 真实工具调用 | [开始前先看这页](docs/00-开始前先看这页.md) |
 | 01 | 看懂模型、工具、历史和停止条件怎样组成闭环 | [从模型调用到第一个 Agent](docs/01-从模型调用到第一个Agent.md) |
 | 02 | 拒绝非法 JSON、未知字段和不合业务规则的参数 | [结构化输出与参数校验](docs/02-结构化输出与参数校验.md) |
 | 03 | 增加多个工具，并控制循环、重试和预算 | [多工具、路由与循环控制](docs/03-多工具路由与循环控制.md) |
@@ -61,13 +62,13 @@ Agent 循环 ──→ 模型：回答，或提出工具调用
 
 | 文件 | 初学时只需要知道什么 |
 |---|---|
-| [`models.py`](tutorial/src/mini_agent/models.py) | 定义模型统一返回什么；脚本模型让学习和测试不依赖网络 |
+| [`real_deepseek.py`](tutorial/src/mini_agent/real_deepseek.py) | 把 DeepSeek 的真实响应转换成 Agent 循环使用的统一结构 |
+| [`models.py`](tutorial/src/mini_agent/models.py) | 定义 Agent 循环依赖的模型返回结构；脚本模型只供单元测试 |
 | [`tools.py`](tutorial/src/mini_agent/tools.py) | 注册工具、公开 Schema、解析与校验参数、执行函数 |
 | [`agent.py`](tutorial/src/mini_agent/agent.py) | 整个 Agent 循环；先从 `run()` 开始读 |
 | [`approvals.py`](tutorial/src/mini_agent/approvals.py) | 有副作用的工具由程序请求确认，不让模型自己批准 |
 | [`tracing.py`](tutorial/src/mini_agent/tracing.py) | 记录模型与工具的执行步骤，供测试和排障 |
-| [`demo.py`](tutorial/src/mini_agent/demo.py) | 无 Key 的第一条完整轨迹 |
-| [`real_deepseek.py`](tutorial/src/mini_agent/real_deepseek.py) | 看懂离线版以后才运行的真实模型适配器 |
+| [`demo.py`](tutorial/src/mini_agent/demo.py) | 使用 DeepSeek V4 Pro 的第一条真实工具轨迹 |
 
 ## 与模型说明书的边界
 
@@ -84,6 +85,6 @@ Agent 循环 ──→ 模型：回答，或提出工具调用
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-`mini-agent-demo` 也不会请求模型。只有你主动设置 `DEEPSEEK_API_KEY` 并运行 `mini-agent-deepseek` 时，才会把内容发送给厂商并可能计费。当前验证边界和真实调用方法见 [教学项目说明](tutorial/README.md)。
+`mini-agent-demo` 和 `mini-agent-multi` 都会把示例消息发送给 DeepSeek 并可能计费。单元测试使用脚本响应，不请求模型；脚本模型是测试替身，不是教程默认模型。当前验证边界和真实调用方法见 [教学项目说明](tutorial/README.md)。
 
 本项目采用 [Unlicense](LICENSE)。

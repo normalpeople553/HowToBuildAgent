@@ -4,7 +4,7 @@
 
 One tool may fit in an `if`; several tools need an explicit registry, router, executor and loop budget. Verify tool fields, parallel-call behavior and `tool_choice` against the exact model. [DeepSeek Tool Calls](https://api-docs.deepseek.com/guides/tool_calls/) · [Model Manual executable tool example](https://github.com/normalpeople553/HowToCallLLM/blob/main/models/deepseek/deepseek-flash/examples/05_tool_calling.py)
 
-Run `mini-agent-multi`. [`multi_tool_demo.py`](../../tutorial/src/mini_agent/multi_tool_demo.py) returns `get_weather` and `multiply` in one scripted response. The Agent validates the entire batch, then executes both calls in response order. The tutorial deliberately stays sequential until independence and concurrency safety can be established.
+Run `mini-agent-multi`. [`multi_tool_demo.py`](../../tutorial/src/mini_agent/multi_tool_demo.py) asks real DeepSeek to complete both `get_weather` and `multiply`. The model may request them in one batch or across consecutive turns; every batch is validated before sequential execution, and the program verifies that both tools completed. This makes real API requests and may incur charges.
 
 ## 1. Four components
 

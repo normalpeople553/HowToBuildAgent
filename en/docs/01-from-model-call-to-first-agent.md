@@ -8,7 +8,7 @@ This chapter takes apart the Mini Agent you just ran. The goal is to understand 
 
 | Part | Tutorial code | Responsibility |
 |---|---|---|
-| Model | [`models.py`](../../tutorial/src/mini_agent/models.py) | Return final text or propose tool calls |
+| Model adapter | [`real_deepseek.py`](../../tutorial/src/mini_agent/real_deepseek.py) | Call DeepSeek and return final text or proposed tool calls |
 | Tool registry | [`tools.py`](../../tutorial/src/mini_agent/tools.py) | Bind public descriptions and schemas to local handlers |
 | Loop | [`agent.py`](../../tutorial/src/mini_agent/agent.py) | Ask, validate, execute, return results, and stop |
 | State | `messages` and `used_call_ids` | Preserve turn history and reject duplicate IDs |
@@ -16,9 +16,11 @@ This chapter takes apart the Mini Agent you just ran. The goal is to understand 
 
 OpenAI's agent overview separates model configuration, tools, state, and execution environments; when you build directly on model responses, your application owns the loop, history, and local tool execution. [Agents](https://developers.openai.com/api/docs/guides/agents)
 
-## Read the model boundary first
+## Read the real model adapter first
 
-`ModelClient.complete(messages, tools)` returns a small `ModelReply`: content, tool calls, and a finish reason. `ScriptedModel` implements that same interface without a network request. This keeps the Agent loop independent from a changing provider SDK and makes tests deterministic.
+`DeepSeekChatModel.complete(messages, tools)` calls the online DeepSeek API and converts the provider response into a small `ModelReply`: content, tool calls, and a finish reason. It explicitly uses `deepseek-v4-pro`, `https://api.deepseek.com`, automatic tool selection, and non-thinking mode. Verify those fields in the current [DeepSeek Chat Completions API](https://api-docs.deepseek.com/api/create-chat-completion/).
+
+The tutorial starts with this real adapter. `ScriptedModel` exists only so unit tests can reproduce specific failures without spending API tokens.
 
 ## A tool description is not the function
 
@@ -42,13 +44,9 @@ Function calling is a multi-step application conversation, not remote execution 
 
 The final allowed model turn cannot start another tool execution: there would be no remaining model call to consume the result and complete the task.
 
-## Exercises
+## Reproduce failures with fixed tests
 
-Change one thing at a time in `demo.py`, observe the failure, then restore it:
-
-1. Change the tool name to `unknown_tool`.
-2. Add an undeclared `extra` argument.
-3. Construct the Agent with `max_model_turns=1`.
+Open [`tests/test_tutorial_agent.py`](../../tests/test_tutorial_agent.py). Its fixed responses cover an unknown tool, an undeclared argument, duplicate IDs, the final-turn boundary, and denied side effects.
 
 Then run:
 
@@ -56,15 +54,8 @@ Then run:
 python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-## Connect the real model last
+## Keep the roles clear
 
-[`real_deepseek.py`](../../tutorial/src/mini_agent/real_deepseek.py) translates DeepSeek Chat Completions responses into the same `ModelReply`; it does not replace the loop.
-
-```bash
-export DEEPSEEK_API_KEY="your key"
-mini-agent-deepseek
-```
-
-This sends a real request and may incur charges. The adapter explicitly uses `deepseek-v4-pro`; current model identities, provider behavior, pricing links, and separately verified call examples belong in the [Model Manual](https://github.com/normalpeople553/HowToCallLLM/tree/main/models/deepseek).
+`mini-agent-demo` and `mini-agent-multi` use real DeepSeek and may incur charges. `ScriptedModel` is only a unit-test double: it is neither a local model nor the tutorial default. Current model identities, provider behavior, pricing links, and separately verified call examples belong in the [Model Manual](https://github.com/normalpeople553/HowToCallLLM/tree/main/models/deepseek).
 
 Continue with [02 · Structured Output and Validation](02-structured-output-and-validation.md).
