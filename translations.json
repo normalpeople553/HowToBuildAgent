@@ -17,6 +17,7 @@
     {"source": "docs/05-检索与知识库.md", "target": "en/docs/05-retrieval-and-knowledge-bases.md"},
     {"source": "docs/06-MCP与外部工具协议.md", "target": "en/docs/06-mcp-and-external-tools.md"},
     {"source": "docs/07-测试评估与可观测性.md", "target": "en/docs/07-testing-evaluation-and-observability.md"},
-    {"source": "docs/08-权限安全人工确认与部署.md", "target": "en/docs/08-security-confirmation-and-deployment.md"}
+    {"source": "docs/08-权限安全人工确认与部署.md", "target": "en/docs/08-security-confirmation-and-deployment.md"},
+    {"source": "docs/09-Thread与Turn内核.md", "target": "en/docs/09-thread-and-turn-kernel.md"}
   ]
 }

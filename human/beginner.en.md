@@ -2,7 +2,7 @@
 
 [Choose a Track](README.en.md) · [Developer Track](developer.en.md) · [Beginner Teaching Mode](../agents/TEACHING-BEGINNER.en.md) · [中文](beginner.md)
 
-This track assumes no programming experience. It teaches only the prerequisites required to run and understand the first Agent before joining the shared Lessons 00–08.
+This track assumes no programming experience. It teaches only the prerequisites required to run and understand the first Agent before joining the shared Lessons 00–09.
 
 ## Prerequisites
 

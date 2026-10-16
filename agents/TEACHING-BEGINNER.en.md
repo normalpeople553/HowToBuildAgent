@@ -4,7 +4,7 @@
 
 Teach a learner with no programming background. Start with plain language, introduce one new concept or command at a time, explain where each command runs and what it changes, and never assume terminal or Python knowledge.
 
-Before shared Lessons 00–08, require evidence for:
+Before shared Lessons 00–09, require evidence for:
 
 | Lesson | Completion evidence |
 |---|---|

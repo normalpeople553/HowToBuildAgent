@@ -19,5 +19,6 @@ Run `mini-agent-demo` using the setup in [Lesson 00](../en/docs/00-read-this-fir
 | 06 | How do MCP host/client/server roles compose with the loop? | [MCP](../en/docs/06-mcp-and-external-tools.md) |
 | 07 | How are trajectories tested independently from final prose? | [Testing](../en/docs/07-testing-evaluation-and-observability.md) |
 | 08 | How are side effects authorized, confirmed, deduplicated, and audited? | [Safety](../en/docs/08-security-confirmation-and-deployment.md) |
+| 09 | How are durable conversations, tasks, items, and events separated? | [Thread and Turn kernel](../en/docs/09-thread-and-turn-kernel.md) |
 
 Each lesson should produce reviewable evidence: a trajectory test, a small implementation change with preserved invariants, an architecture diagram, or a code review covering a concrete failure path. Use [Developer Teaching Mode](../agents/TEACHING-DEVELOPER.en.md) for guided code reading and exercises.

@@ -17,3 +17,4 @@
 - 修改中文导航或课程时同步英文入口和 `translations.json`。
 - 改代码后至少运行 `python3 -m unittest discover -s tests -p 'test_*.py'`。真实调用会联网并可能计费，只在用户授权和凭据就绪时执行，并区分本地测试与真实 API 结果。
 - 学习进度只在用户同意后写入 `.learning/`；该目录已被 Git 忽略，不记录 Key、完整模型回复或个人敏感信息。
+- 修改运行时必须保持 Thread、Turn、Item、Event 分层：Thread 只允许一个活动 Turn；失败或中断保留审计 Items，但不能把不完整工具协议留给下一 Turn 的模型历史。

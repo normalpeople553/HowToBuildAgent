@@ -20,6 +20,7 @@
 | [`human/README.md`](../human/README.md) | 人类课程路由；分别进入零基础篇和程序员篇 |
 | [`docs/`](../docs/) | 中文课程正文；按任务只读相关章节 |
 | [`tutorial/src/mini_agent`](../tutorial/src/mini_agent/) | 教学用 Agent 运行时与 DeepSeek 适配器 |
+| [`tutorial/src/mini_agent/core.py`](../tutorial/src/mini_agent/core.py) | Thread、Turn、Item、Event 与模型—工具执行内核 |
 | [`tests/test_tutorial_agent.py`](../tests/test_tutorial_agent.py) | 固定响应下的循环、校验、权限与停止边界 |
 | [`tutorial/README.md`](../tutorial/README.md) | 安装、真实调用和测试边界 |
 | [`agents/TEACHING.md`](TEACHING.md) | 教学分流和共同规则；再进入零基础或程序员教学文件 |
@@ -43,6 +44,7 @@
 - 最后允许的模型轮次不能再执行新工具；否则没有剩余轮次让模型读取结果并完成回答。
 - 有副作用的动作在执行点重新授权；模型不能批准自己的请求。默认批准策略保持拒绝。
 - 上下文、工具结果、轮数和重试都必须有硬边界。日志不得默认保存 Key、完整敏感输入、隐藏思考或未脱敏工具回包。
+- Thread 保存跨任务历史，Turn 表示一次任务；一次 Turn 内的多次模型请求称为 model steps，不得混用两个层级的预算和状态。
 
 ## 来源与验证
 

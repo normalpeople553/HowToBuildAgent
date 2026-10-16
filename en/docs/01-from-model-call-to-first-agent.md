@@ -10,8 +10,8 @@ This chapter takes apart the Mini Agent you just ran. The goal is to understand 
 |---|---|---|
 | Model adapter | [`real_deepseek.py`](../../tutorial/src/mini_agent/real_deepseek.py) | Call DeepSeek and return final text or proposed tool calls |
 | Tool registry | [`tools.py`](../../tutorial/src/mini_agent/tools.py) | Bind public descriptions and schemas to local handlers |
-| Loop | [`agent.py`](../../tutorial/src/mini_agent/agent.py) | Ask, validate, execute, return results, and stop |
-| State | `messages` and `used_call_ids` | Preserve turn history and reject duplicate IDs |
+| Kernel and loop | [`core.py`](../../tutorial/src/mini_agent/core.py) | Own Thread/Turn state, ask, validate, execute, return results, and stop |
+| State | `AgentThread`, `Turn`, and `used_call_ids` | Preserve multi-turn history, task state, and call IDs |
 | Boundaries | budgets, validation, and approval | Prevent unbounded or unauthorized execution |
 
 OpenAI's agent overview separates model configuration, tools, state, and execution environments; when you build directly on model responses, your application owns the loop, history, and local tool execution. [Agents](https://developers.openai.com/api/docs/guides/agents)
@@ -30,7 +30,7 @@ Only explicitly registered handlers can execute. Model-generated names and argum
 
 ## Follow the seven trace events
 
-Run `mini-agent-demo` and compare its output with `Agent.run()`:
+Run `mini-agent-demo` and compare its output with `AgentKernel.start_turn()`. `Agent.run()` remains the one-shot compatibility entrypoint:
 
 1. Send current messages and public tool specs to the model.
 2. Receive final text or one or more proposed tool calls.
@@ -59,3 +59,5 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 `mini-agent-demo` and `mini-agent-multi` use real DeepSeek and may incur charges. `ScriptedModel` is only a unit-test double: it is neither a local model nor the tutorial default. Current model identities, provider behavior, pricing links, and separately verified call examples belong in the [Model Manual](https://github.com/normalpeople553/HowToCallLLM/tree/main/models/deepseek).
 
 Continue with [02 · Structured Output and Validation](02-structured-output-and-validation.md).
+
+After Lessons 02–08, [09 · Thread and Turn](09-thread-and-turn-kernel.md) explains the kernel structure in full.
