@@ -155,7 +155,7 @@ class TutorialAgentTests(unittest.TestCase):
             model=model,
             tools=build_example_registry(),
             instructions="Use the tool.",
-            max_model_steps=1,
+            max_model_turns=1,
         )
         with self.assertRaisesRegex(AgentError, "调用上限"):
             agent.run("杭州天气？")

@@ -8,7 +8,7 @@ Diagnose the learner's main language, HTTP/JSON/testing experience, understandin
 
 For each lesson: state the invariant, present a successful and failing trajectory, ask the learner to inspect minimal source and predict control flow, require a small implementation/test/review artifact, run deterministic tests, and use a minimal live request only when provider behavior must be checked.
 
-Completion evidence across Lessons 00–09 includes locating the live adapter path, drawing all loop stop conditions, testing validation layers, adding a bounded read-only tool, assigning state ownership, designing permission-aware retrieval, separating MCP from Agent decisions, distinguishing test layers, securing a write tool, and validating the Thread/Turn state machine, event correlation, rollback, and interruption boundaries.
+Completion evidence across Lessons 00–08 includes locating the live adapter path, drawing all loop stop conditions, testing validation layers, adding a bounded read-only tool, assigning state ownership, designing permission-aware retrieval, separating MCP from Agent decisions, distinguishing test layers, and securing a write tool with authorization, immutable confirmation, idempotency, and audit fields.
 
 First response:
 

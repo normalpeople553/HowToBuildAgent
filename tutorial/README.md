@@ -42,6 +42,4 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 
 测试使用 `ScriptedModel` 固定模型返回，只用来稳定覆盖异常路径，不请求厂商 API。教学默认入口始终是 DeepSeek 在线模型。
 
-代码包含工具白名单、参数校验、重复 ID 检查、整批预校验、模型步骤上限、工具输出长度上限、人工确认接口和轨迹记录。`core.py` 进一步提供 Thread、Turn、Item 与 Event：一次性 `Agent.run()` 仍可使用，连续任务则使用 `create_thread()` 和 `run_turn()`。完整说明见 [Thread 与 Turn 内核](../docs/09-Thread与Turn内核.md)。
-
-它是内存内、同步的教学实现，不是可以直接承载生产业务的通用框架。
+代码包含工具白名单、参数校验、重复 ID 检查、整批预校验、模型轮数上限、工具输出长度上限、人工确认接口和轨迹记录。它是教学实现，不是可以直接承载生产业务的通用框架。

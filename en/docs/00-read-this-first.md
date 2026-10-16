@@ -37,7 +37,7 @@ Function calling is a multi-step application flow, and generated arguments still
 
 1. [`demo.py`](../../tutorial/src/mini_agent/demo.py)
 2. [`real_deepseek.py`](../../tutorial/src/mini_agent/real_deepseek.py)
-3. `AgentKernel.start_turn()` in [`core.py`](../../tutorial/src/mini_agent/core.py), reached through the simple `Agent.run()` facade
+3. `Agent.run()` in [`agent.py`](../../tutorial/src/mini_agent/agent.py)
 4. [`example_tools.py`](../../tutorial/src/mini_agent/example_tools.py)
 5. [`tools.py`](../../tutorial/src/mini_agent/tools.py)
 

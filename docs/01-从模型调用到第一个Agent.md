@@ -14,8 +14,8 @@
 |---|---|---|
 | 模型适配器 | [`real_deepseek.py`](../tutorial/src/mini_agent/real_deepseek.py) | 调用 DeepSeek，并返回正文或工具请求 |
 | 工具注册表 | [`tools.py`](../tutorial/src/mini_agent/tools.py) | 保存公开说明、参数契约和本地处理函数 |
-| 内核与循环 | [`core.py`](../tutorial/src/mini_agent/core.py) | 管理 Thread/Turn，请求模型、执行工具、回传结果并判断结束 |
-| 状态 | `AgentThread`、`Turn` 与 `used_call_ids` | 保存跨轮历史、单次任务和调用 ID |
+| 循环 | [`agent.py`](../tutorial/src/mini_agent/agent.py) | 请求模型、执行工具、回传结果、判断结束 |
+| 状态 | `messages` 与 `used_call_ids` | 保存本轮历史，防止调用 ID 重复 |
 | 边界 | 轮数、长度、校验与批准策略 | 阻止无限循环、越权和无界输出 |
 
 OpenAI 的 Agent 文档把模型、指令、工具、状态和执行环境作为不同配置或资源；直接使用模型响应构建 Agent 时，应用需要自己管理循环、工具执行和历史。[Agents](https://developers.openai.com/api/docs/guides/agents) 本教程选择自己写循环，是为了先看清这些责任，不是说实际项目不能使用 SDK 或框架。
@@ -44,7 +44,7 @@ OpenAI 的 Agent 文档把模型、指令、工具、状态和执行环境作为
 
 `ToolRegistry` 只会执行显式注册的处理器。即使模型返回 `delete_everything`，程序也不会用反射、`eval` 或字符串拼接寻找一个同名函数。模型输出始终是不可信输入。
 
-## 4. 按七步轨迹读内核循环
+## 4. 按七步轨迹读 `Agent.run()`
 
 再次运行：
 
@@ -52,7 +52,7 @@ OpenAI 的 Agent 文档把模型、指令、工具、状态和执行环境作为
 mini-agent-demo
 ```
 
-然后把输出与 [`AgentKernel.start_turn()`](../tutorial/src/mini_agent/core.py) 对照。[`Agent.run()`](../tutorial/src/mini_agent/agent.py) 是一次性调用的兼容入口：它创建 Thread 后把工作交给内核。
+然后把输出与 [`Agent.run()`](../tutorial/src/mini_agent/agent.py) 对照。
 
 ### 4.1 `model_request`
 
@@ -95,7 +95,7 @@ mini-agent-demo
 
 1. 未注册的 `unknown_tool`；
 2. 多出的 `extra` 参数；
-3. `max_model_steps=1` 时仍请求工具；
+3. `max_model_turns=1` 时仍请求工具；
 4. 重复的工具调用 ID；
 5. 未经批准的写操作。
 
@@ -125,5 +125,3 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 - [ ] 已用 DeepSeek 跑通过成功路径，也能用固定响应测试异常路径。
 
 下一章会把“参数合法”拆成 JSON 语法、Schema 结构和业务规则三层：[02 · 结构化输出与参数校验](02-结构化输出与参数校验.md)。
-
-完成 02–08 后，第 09 章会系统解释这里出现的 Thread、Turn、Item 与 Event：[09 · Thread 与 Turn 内核](09-Thread与Turn内核.md)。

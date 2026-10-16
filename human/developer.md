@@ -23,15 +23,14 @@ mini-agent-demo
 | 课次 | 工程问题 | 章节 | 源码检查点 |
 |---|---|---|---|
 | 00 | 厂商适配层怎样进入统一循环 | [真实调用](../docs/00-开始前先看这页.md) | [`real_deepseek.py`](../tutorial/src/mini_agent/real_deepseek.py) |
-| 01 | Agent 循环的状态转移和停止条件是什么 | [第一个 Agent](../docs/01-从模型调用到第一个Agent.md) | [`core.py`](../tutorial/src/mini_agent/core.py) |
+| 01 | Agent 循环的状态转移和停止条件是什么 | [第一个 Agent](../docs/01-从模型调用到第一个Agent.md) | [`agent.py`](../tutorial/src/mini_agent/agent.py) |
 | 02 | JSON、Schema、业务与权限校验如何分层 | [结构化输出](../docs/02-结构化输出与参数校验.md) | [`tools.py`](../tutorial/src/mini_agent/tools.py) |
-| 03 | 多工具、批量调用、重试和预算如何受控 | [路由与循环](../docs/03-多工具路由与循环控制.md) | `AgentKernel.start_turn()` 与工具注册表 |
+| 03 | 多工具、批量调用、重试和预算如何受控 | [路由与循环](../docs/03-多工具路由与循环控制.md) | `Agent.run()` 与工具注册表 |
 | 04 | 历史、状态、摘要和长期记忆怎样分离 | [状态与上下文](../docs/04-状态记忆与上下文管理.md) | 消息构造与状态所有权 |
 | 05 | 检索的权限过滤、证据和失败策略是什么 | [检索](../docs/05-检索与知识库.md) | 检索边界与引用 |
 | 06 | MCP host/client/server 与 Agent 循环怎样组合 | [MCP](../docs/06-MCP与外部工具协议.md) | 协议层与决策层边界 |
 | 07 | 怎样测试轨迹而不是只断言最终字符串 | [测试与可观测性](../docs/07-测试评估与可观测性.md) | [`test_tutorial_agent.py`](../tests/test_tutorial_agent.py) |
 | 08 | 写操作如何授权、确认、幂等和审计 | [安全与部署](../docs/08-权限安全人工确认与部署.md) | [`approvals.py`](../tutorial/src/mini_agent/approvals.py) |
-| 09 | 长期会话、单次任务、产物和事件如何分层 | [Thread 与 Turn 内核](../docs/09-Thread与Turn内核.md) | [`core.py`](../tutorial/src/mini_agent/core.py) |
 
 ## 每章的程序员验收方式
 
